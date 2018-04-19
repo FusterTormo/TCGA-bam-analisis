@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #To download new cancers, change this line to where the manifests are, and that's all
-cd /g/strcombio/fsupek_cancer3/TCGA_bam/TCGA-BRCA/
+cd /g/strcombio/fsupek_cancer3/TCGA_bam/TCGA-BLCA/
+sta=`date`
 token="/mnt/data/token.txt"
 gdc="/mnt/data/gdc-client download"
 minspace=41943040	
@@ -20,3 +21,5 @@ for f in *; do
 #		break	
 #	fi
 done
+echo -e "getBams.sh started on $sta\n\ngetBams.sh ended on `date`"
+
