@@ -6,14 +6,14 @@ import urllib
 import re
 
 # Get the repository to get the cancer samples
-print "Where to go?\n===================\n\t[1] /g/strcombio/fsupek_cancer1/TCGA_bam/\n\t[2] /g/strcombio/fsupek_cancer2/TCGA_bam/\n\t[3] /g/strcombio/fsupek_data/TCGA_data/"
+print "Where to go?\n===================\n\t[1] /g/strcombio/fsupek_cancer1/TCGA_bam/\n\t[2] /g/strcombio/fsupek_cancer2/TCGA_bam/\n\t[3] /g/strcombio/fsupek_cancer3/TCGA_bam/"
 aux = int(raw_input("Your choice: "))
 if aux == 1 :
     root = '/g/strcombio/fsupek_cancer1/TCGA_bam/'
 elif aux == 2 :
     root = '/g/strcombio/fsupek_cancer2/TCGA_bam/'
 elif aux == 3 :
-    root = '/g/strcombio/fsupek_data/TCGA_data/'
+    root = '/g/strcombio/fsupek_cancer3/TCGA_bam/'
 else :
     raise ValueError("Invalid option")
 
