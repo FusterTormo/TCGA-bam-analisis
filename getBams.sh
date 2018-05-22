@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #To download new cancers, change this line to where the manifests are, and that's all
-cd /g/strcombio/fsupek_cancer3/TCGA_bam/TCGA-UCEC/
+cd /g/strcombio/fsupek_cancer3/TCGA_bam/TCGA-KIRC/
 sta=`date`
 token="/mnt/data/token.txt"
 gdc="/mnt/data/gdc-client download"

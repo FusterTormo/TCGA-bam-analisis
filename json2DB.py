@@ -14,9 +14,12 @@ import json
 #cType = "LIHC"
 #filer = "clinical.project-TCGA-COAD.2018-02-27.json"
 #cType = "COAD"
-filer = "clinical.project-TCGA-READ.2018-02-27.json"
-cType = "READ"
-
+#filer = "clinical.project-TCGA-READ.2018-02-27.json"
+#cType = "READ"
+#filer = "clinical.project-TCGA-BRCA.2018-05-11.json"
+#cType = "BRCA"
+filer = "clinical.project-TCGA-BLCA.2018-05-11.json"
+cType = "BLCA"
 
 sql = "clinical_data.sql"
 print "Reading {} data".format(filer)
