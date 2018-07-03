@@ -22,7 +22,9 @@ CREATE A DIRECTORY IN /mnt/data/TCGA_bam with the name of the variable you wrote
 #subtype = 'TCGA-UCEC'
 #subtype = 'TCGA-KIRC'
 #subtype = 'TCGA-KIRP'
-subtype = 'TCGA-KICH'
+#subtype = 'TCGA-KICH'
+#subtype = 'TCGA-GBM'
+subtype = 'TCGA-PRAD'
 
 #Get the number of samples in a specific cancer subtype
 filters = '{"op":"=","content":{"field": "project.project_id", "value":["' + subtype +'"]}}'
