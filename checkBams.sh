@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #To download new cancers, change this line to where the manifests are, and that's all
-cd /g/strcombio/fsupek_cancer3/TCGA_bam/BRCA/
+cd /g/strcombio/fsupek_cancer3/TCGA_bam/pending_check/
 sta=`date`
 token="/mnt/data/token.txt"
 gdc="/mnt/data/gdc-client download"
 minspace=41943040	
-for f in *; do
+for f in TCGA*; do
 	echo "Getting $f. Started at `date`"
 	cd $f
 	#Manifest has the same name as the folder, plus ".txt" extension. -n parameter should be between 30-40 to get the maximum download speed
