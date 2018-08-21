@@ -22,10 +22,12 @@ import json
 #cType = "BLCA"
 #filer = 'clinical.project-TCGA-UCEC.2018-05-22.json'
 #cType = 'UCEC'
-filer = 'clinical.project-TCGA-KIRC.2018-06-17.json'
-cType = 'KIRC'
+#filer = 'clinical.project-TCGA-KIRC.2018-06-17.json'
+#cType = 'KIRC'
 #filer = 'clinical.project-TCGA-KIRP.2018-06-17.json'
 #cType = 'KIRP'
+filer = 'clinical.project-TCGA-KICH.2018-06-19.json'
+cType = 'KICH'
 
 sql = "clinical_data.sql"
 print "Reading {} data".format(filer)
