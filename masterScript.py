@@ -12,8 +12,8 @@ import multiprocessing
 #Constants
 pathDb = "/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db" #Absolute path where DB is stored
 absHNSC = "/g/strcombio/fsupek_cancer1/TCGA_bam/" #Absolute path where HNSC and LIHC samples are stored
-absOthers = "/g/strcombio/fsupek_cancer2/TCGA_bam/" #Absolute path where other samples are stored
-tmpCOAD = "/g/strcombio/fsupek_data/TCGA_data/" #Absolute path where COAD and READ are currently stored
+absLUAD = "/g/strcombio/fsupek_cancer2/TCGA_bam/" #Absolute path where LUAD, LUSC, OV and STAD samples are stored
+absOthers = "/g/strcombio/fsupek_cancer3/TCGA_bam/" #Absolute path where other samples are stored
 testSamps = 1
 
 def storeDBanalysis(uuid, program, com, stlog, errlog, exitCode) :
@@ -401,8 +401,8 @@ def run(cancer,analysis,sampleType,delete,numSamples) :
             if r[3] == 'No' : #Check if the bam is stered as deleted in the database
                 if cancer == 'HNSC' or cancer == "LIHC":
                     auxP = absHNSC + cancer + "/" + r[0] + "/" + r[1] + "/" + r[2]
-                elif cancer == 'COAD' or cancer == 'READ':
-                    auxP = tmpCOAD + cancer + "/" + r[0] + "/" + r[1] + "/" + r[2]
+                elif cancer == 'LUAD' or cancer == 'LUSC' or cancer == "OV" or cancer == "STAD":
+                    auxP = absLUAD + cancer + "/" + r[0] + "/" + r[1] + "/" + r[2]
                 else :
                     auxP = absOthers + cancer + "/" + r[0] + "/" + r[1] + "/" + r[2]
                 paths.append(auxP)
