@@ -1,3 +1,5 @@
 bam-analysis/
 *.pyc
 *.log
+*.sql
+listBams.py
