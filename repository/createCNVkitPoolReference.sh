@@ -4,7 +4,7 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-cd /g/strcombio/fsupek_cancer2/TCGA_bam/BRCA
+cd /g/strcombio/fsupek_cancer3/TCGA_bam/BRCA
 rsync -aP 04e6b781-48c0-473d-83e2-b3770e52bd38/TCGA-B6-A0RE-10A-01W-A071-09_HOLD_QC_PENDING_IlluminaGA-DNASeq_exome_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP 07a41712-a48a-4d45-ae2a-0ad492e6784f/TCGA-E2-A15O-10A-01D-A110-09_IlluminaGA-DNASeq_exome_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP 1571b866-6da0-48a3-875c-21cbaef4e7cb/TCGA-A2-A0SV-10A-01W-A097-09_IlluminaGA-DNASeq_exome_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
@@ -26,7 +26,7 @@ rsync -aP 9aa3287c-4109-43f9-85a1-13905a0a219b/TCGA-D5-6929-10A-01D-1924-10_hg19
 rsync -aP 9ca38767-1a54-485d-9d93-01a3e712a670/TCGA-CK-5912-10A-01D-1650-10_hg19_Illumina_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP c8573454-ebd2-48f1-9ba8-f0b575664d3d/TCGA-DM-A285-10A-01D-A16V-10_hg19_Illumina_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP c892c83c-adfa-44c3-a0db-570379ca1be7/TCGA-CM-6167-10A-01D-1650-10_Illumina_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
-cd ../STAD
+cd ../../../fsupek_cancer2/TCGA_bam/STAD
 rsync -aP TCGA-BR-7722/f1a932d7-301d-4553-b0e9-b489c884bd42/C440.TCGA-BR-7722-10A-01D-2201-08.6_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP TCGA-CD-8524/8f932982-28bc-408a-b8e3-966566bacb78/C440.TCGA-CD-8524-10A-01D-2341-08.8_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
 rsync -aP TCGA-D7-A4YV/a88df0df-1859-4ff9-8b6d-f8495e25d5b5/C440.TCGA-D7-A4YV-10A-01D-A25E-08.1_gdc_realn.ba* /mnt/data/cnvkit_pool_reference/
