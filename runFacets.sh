@@ -1,7 +1,7 @@
 #!/bin/bash
 
 snpPileup=~/R/x86_64-pc-linux-gnu-library/3.4/facets/extcode/snp-pileup
-vcf=~/genome_references/00-common_all.vcf.gz #Reference vcf file with the SNPs to look for SNPs
+vcf=~/genome_references/1000GENOMES-phase_3.vcf.gz #Reference vcf file with the SNPs to look for SNPs. 
 normal=$1 #Absolute path for normal bam
 tumor=$2 #Abolute path for tumor bam
 #The program will create 2 different outputs. One only for the regions in the vcf, and the other inserting a blank record every 100 positions if there is no SNP before
