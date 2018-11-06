@@ -60,8 +60,16 @@ for c in cancer :
                         query = url + uuid + fields
                         response = requests.get(query)
                         res = response.json()
-                        platform = res['data']['platform']
-                        exp = "'" + res['data']['experimental_strategy'] + "'"
+                        if 'platform' in res['data'] :
+                            platform = res['data']['platform']
+                        else :
+                            platform = "NULL"
+
+                        if 'experimental_strategy' in res['data'] :
+                            exp = "'" + res['data']['experimental_strategy'] + "'"
+                        else :
+                            exp = "NULL"
+
                         #Gather analyte type (DNA, WGA)
                         molecule = "'" + res['data']['cases'][0]['samples'][0]['portions'][0]['analytes'][0]['analyte_type'] + "'"
                         #Gather information if bam is tumor tissue, normal tissue, normal blood...
@@ -105,6 +113,9 @@ for c in cancer :
                         print "ERROR!! found error when searching {} in submitter {}. UUID {}".format(query,submitter,uuid)
                         print er
                         next
+                    except KeyError, e :
+                        print "Not found key {} in query {}".format(e, query)
+                        print "Returned object {}\n".format(res)
 
                 break
         break
