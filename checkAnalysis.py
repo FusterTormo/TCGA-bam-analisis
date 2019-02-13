@@ -93,13 +93,13 @@ def createAnalysisDict(cancer, subs, gDict, sDict) :
                 sDict[uuid] = []
             sDict[uuid].append([i[1], i[2]])
 
-def checkGermline(cases, analyses) :
+def checkGermline(cases, analyses, germlineProgramsC) :
     #Case has list of uuids
     pending = []
     for c in cases :
         try :
             prs = analyses[c]
-            for p in germlinePrograms :
+            for p in germlineProgramsC :
                 #Find all the analyses done using this program
                 sublist = getAnalyses(p,prs)
                 ispending = True
@@ -111,12 +111,12 @@ def checkGermline(cases, analyses) :
                 if ispending :
                     pending.append([c, p])
         except KeyError :
-            for er in germlinePrograms :
+            for er in germlineProgramsC :
                 pending.append([c, er])
 
     return pending
 
-def checkSomatic(case, uuids, analyses) :
+def checkSomatic(case, uuids, analyses, somaticProgramsC) :
     pending = []
     comb = getPairs(case)
     for c in comb :
@@ -125,7 +125,7 @@ def checkSomatic(case, uuids, analyses) :
         root = "{}_VS_{}".format(aux1, aux2)
         try :
             prs = analyses[root]
-            for s in somaticPrograms :
+            for s in somaticProgramsC :
                 ispending = True
                 sublist = getAnalyses(s, prs)
                 for i in sublist :
@@ -135,7 +135,7 @@ def checkSomatic(case, uuids, analyses) :
                 if ispending :
                     pending.append([c[0], c[1], s])
         except KeyError :
-            for er in somaticPrograms :
+            for er in somaticProgramsC :
                 pending.append([c[0], c[1], er])
 
     return pending
@@ -189,7 +189,7 @@ def removeBams(cases) :
                 except sqlite3.OperationalError, e :
                     print "ERROR: Error while executing the query {}.\nDescription:\n\t{}".format(e)
 
-def checkSamples(cancer, askRemove = False) :
+def checkSamples(cancer, askRemove = False, askBash = True) :
     done = []
     pending = []
     subs = {}
@@ -200,14 +200,24 @@ def checkSamples(cancer, askRemove = False) :
     createAnalysisDict(cancer, subs, gDict, sDict)
     print "INFO: {} submitters found with bam files".format(len(subs))
     # print subs
+
+    if askBash:
+        opt = raw_input(
+            "Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+
     for s in subs :
-        pendingGermline = checkGermline(subs[s], gDict)
-        pendingSomatic = checkSomatic(s, subs[s], sDict)
+        if opt == 'y' or opt == 'Y':
+            pendingGermline = checkGermline(subs[s], gDict, germlineProgramsDroppedTools)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticProgramsDroppedTools)
+        else:
+            pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
+
 
         if len(pendingGermline) == 0 and len(pendingSomatic) == 0 :
-            done.append(s)
+           done.append(s)
         else :
-            pending.append(s)
+           pending.append(s)
 
         if counter % 50 == 0:
             print "INFO: {} submitters checked from {}".format(counter, len(subs))
@@ -215,6 +225,10 @@ def checkSamples(cancer, askRemove = False) :
         counter += 1
 
     (removed, notRemoved) = getDeletedBams(done)
+
+    print "INFO: There are {} submitters with all the analyses completed".format(len(done))
+    print "INFO: From these submitters, there are:\n\t{} bams removed\n\t{} bams pending to remove".format(removed, notRemoved)
+    print "INFO: There are {} submitters with pending analyses".format(len(pending))
 
     if notRemoved > 0 and askRemove :
         opt = raw_input("Remove analysed bams? (y/n) ")
@@ -282,8 +296,8 @@ def getStats(cancer, askBash = True) :
     print "INFO: {} submitters found with bam files".format(len(subs))
 
     for s in subs :
-        pendingGermline = checkGermline(subs[s], gDict)
-        pendingSomatic = checkSomatic(s, subs[s], sDict)
+        pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
+        pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
         if len(pendingGermline) == 0 and len(pendingSomatic) == 0 :
             done.append(s)
         else :
@@ -319,28 +333,22 @@ def getStats(cancer, askBash = True) :
     if askBash :
         print "\nINFO: List of pending analyses stored in ./pending.md"
         opt = raw_input("Create bash to execute all pending analyses? (y/n): ")
-        opt_batch = raw_input(
-            "Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
-        opt_list_analysis = raw_input(
-            "Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+        opt_batch = raw_input("Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
+        opt_list_analysis = raw_input("Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
 
         if opt == 'y' or opt == 'Y':
             writeBash(allPending)
-            print
-            "\nINFO: Bash script stored as ./runPending.sh"
+            print "\nINFO: Bash script stored as ./runPending.sh"
         if opt_batch == 'y' or opt_batch == 'Y':
             # moveBatchScripts(allPending, cancer) #del
-            print
-            "\nINFO: Batch scripts have been moved"
+            print "\nINFO: Batch scripts have been moved"
 
-            if opt_list_analysis == 'y' or opt_list_analysis == 'Y':
+            if opt_list_analysis =='y' or opt_list_analysis =='Y':
                 moveBatchScripts(allPending, cancer, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
-                print
-                "\nINFO: Batch scripts have been moved"
+                print "\nINFO: Batch scripts have been moved"
             else:
                 moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
-                print
-                "\nINFO: Batch scripts have been moved"
+                print "\nINFO: Batch scripts have been moved"
 
 def writePending(samples, cancer, doGetBamsScript) :
     path = "{}/{}".format(mc.cancerPath[cancer], cancer)
