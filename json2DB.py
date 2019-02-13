@@ -26,8 +26,15 @@ import json
 #cType = 'KIRC'
 #filer = 'clinical.project-TCGA-KIRP.2018-06-17.json'
 #cType = 'KIRP'
-filer = 'clinical.project-TCGA-KICH.2018-06-19.json'
-cType = 'KICH'
+#filer = 'clinical.project-TCGA-KICH.2018-06-19.json'
+#cType = 'KICH'
+#filer = 'clinical.cases_selection.2018-10-18.json'
+#cType = 'GBM'
+#filer = 'clinical.project-TCGA-PAAD.2018-10-18.json'
+#cType = 'PAAD'
+filer = 'clinical.project-TCGA-THCA.2018-11-14.json'
+cType = 'THCA'
+
 
 sql = "clinical_data.sql"
 print "Reading {} data".format(filer)
