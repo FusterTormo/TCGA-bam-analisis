@@ -11,6 +11,11 @@ from sys import stderr, exit
 germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
 somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "MSIsensor"]
 
+### List of tools updated until dropping the ones that are not use anymore (2019/02/01)
+## CNVkit, excavator, ascat, manta germline
+germlineProgramsDroppedTools = ["Strelka2 germline", "Platypus germline", "Bedtools genomeCov"]
+somaticProgramsDroppedTools = ["Strelka2 somatic", "FACETS", "Manta somatic", "MSIsensor"]
+
 def getPairs(case) :
     '''Looks for how many tumor samples and normal samples has the case Id passed as parameter.
     Returns the combination of all tumors with all normals in a 2D list'''
@@ -314,9 +319,28 @@ def getStats(cancer, askBash = True) :
     if askBash :
         print "\nINFO: List of pending analyses stored in ./pending.md"
         opt = raw_input("Create bash to execute all pending analyses? (y/n): ")
+        opt_batch = raw_input(
+            "Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
+        opt_list_analysis = raw_input(
+            "Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+
         if opt == 'y' or opt == 'Y':
             writeBash(allPending)
-            print "\nINFO: Bash script stored as ./runPending.sh"
+            print
+            "\nINFO: Bash script stored as ./runPending.sh"
+        if opt_batch == 'y' or opt_batch == 'Y':
+            # moveBatchScripts(allPending, cancer) #del
+            print
+            "\nINFO: Batch scripts have been moved"
+
+            if opt_list_analysis == 'y' or opt_list_analysis == 'Y':
+                moveBatchScripts(allPending, cancer, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
+                print
+                "\nINFO: Batch scripts have been moved"
+            else:
+                moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
+                print
+                "\nINFO: Batch scripts have been moved"
 
 def writePending(samples, cancer, doGetBamsScript) :
     path = "{}/{}".format(mc.cancerPath[cancer], cancer)
@@ -426,6 +450,90 @@ def writeBash(samples) :
                     fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[s[2]]))
 
     os.chmod(filename, stat.S_IRWXU)
+
+def moveBatchScripts(samples, cancer, germlineProgramsM, somaticProgramsM) :
+    #Dictionary to convert the name stored in the database for the program to the name used in masterSciptLib
+    convert2batch = { "Strelka2 germline" : "strelka", "Platypus germline" : "platypus", "EXCAVATOR2" : "excavator", "CNVkit" : "cnvkit",
+                      "Manta germline" : "manta", "Bedtools genomeCov" : "cov", "Strelka2 somatic" : "strelkaS", "AscatNGS" : "ascat",
+                      "FACETS" : "facets", "Manta somatic" : "mantaS", "MSIsensor" : "msi"}
+
+    ### List of dropped dropped tools (2019/02/01)
+    ## CNVkit, excavator, ascat, manta germline
+    convert2batchDroppedTools = { "Strelka2 germline" : "strelka", "Platypus germline" : "platypus", "Bedtools genomeCov" : "cov",
+                                  "Strelka2 somatic" : "strelkaS", "FACETS" : "facets", "Manta somatic" : "mantaS", "MSIsensor" : "msi"}
+
+    convert2batch = convert2batchDroppedTools
+
+    dictBatchFolder = { "KICH" : "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KICH_20190206",
+                        "KIRP" : "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KIRP_20190201",
+                        "STAD":  "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_STAD_20181220_jose",
+                        "UCEC":  "/g/strcombio/fsupek_cancer2/TCGA_bam/batches",
+                        "LUAD":  "/g/strcombio/fsupek_cancer2/TCGA_bam/batches/LUAD",
+                        "LUSC": "/g/strcombio/fsupek_cancer2/TCGA_bam/batches/LUSC",}
+
+    program2Folder = { "Strelka2 germline" : "strelkaGerm", "Platypus germline" : "platypusGerm", "EXCAVATOR2" : "EXCAVATOR2",
+                       "CNVkit" : "CNVkit", "Manta germline" : "mantaGerm", "Bedtools genomeCov" : "genomeCoverage",
+                       "Strelka2 somatic" : "Strelka2", "AscatNGS" : "ASCAT", "FACETS" : "FACETS", "Manta somatic" : "Manta",
+                       "MSIsensor" : "MSIsensor"}
+
+    batchFolder = dictBatchFolder[cancer]
+    date = time.strftime("%Y%m%d")
+    batchesFolderRelaunch = "{}/batches_{}_{}".format("/g/strcombio/fsupek_cancer2/TCGA_bam", cancer, date)
+
+    if not os.path.exists(batchesFolderRelaunch):
+        os.makedirs(batchesFolderRelaunch)
+
+    for k, v in samples.iteritems() :
+        if len(v[0]) > 0 :
+            for g in v[0] :
+
+                if g[1] in germlineProgramsM:
+                    path_to_batch = "{}/batch_{}_{}.sh".format(batchFolder, k, convert2batch[g[1]])
+                    path_to_new_batches = "{}/batch_{}_{}.sh".format(batchesFolderRelaunch, k, convert2batch[g[1]])
+
+                    try:
+                        print "[MSG]: Germline path to batches new and old:", path_to_new_batches, path_to_batch
+                        copyfile(path_to_batch, path_to_new_batches)
+                    except OSError:
+                        print >> stderr, "[ERROR]: Germline slurm batch file couldn't be copied"
+
+                    path_analysis_to_rm = "{}/{}/{}/{}/{}".format(mc.cancerPath[cancer], cancer, k, g[0], program2Folder[g[1]])
+
+                    if os.path.isdir(path_analysis_to_rm) :
+                        try:
+                            print >> stderr, "[MSG]: Germline Analysis folder remove to enable its relaunch ", path_analysis_to_rm
+                            rmtree (path_analysis_to_rm)
+                        except OSError:
+                            print >> stderr, "[ERROR]: Germline Analysis folder couldn be deleted ", path_analysis_to_rm
+
+                    else:
+                        print >> stderr, "[ERROR]: Germline Analysis folder couldn't be found ", path_analysis_to_rm
+
+        if len(v[1]) > 0 :
+            for s in v[1] :
+                if s[2] in somaticProgramsM:
+                    path_to_batch = "{}/batch_{}_{}.sh".format(batchFolder, k, convert2batch[s[2]])
+                    path_to_new_batches = "{}/batch_{}_{}.sh".format(batchesFolderRelaunch, k, convert2batch[s[2]])
+
+                    try:
+                        print "[MSG]: Somatic path to batches new and old:", path_to_new_batches, path_to_batch
+                        copyfile(path_to_batch, path_to_new_batches)
+                    except OSError:
+                        print >> stderr, "[ERROR]: Somatic slurm batch file couldn't be copied", path_to_batch
+
+                    aux1 = s[0].split("-")[0]
+                    aux2 = s[1].split("-")[0]
+                    somaticFolder = "{}_VS_{}_{}".format(aux1, aux2, program2Folder[s[2]])
+                    path_analysis_to_rm = "{}/{}/{}/{}".format(mc.cancerPath[cancer], cancer, k, somaticFolder)
+
+                    if os.path.isdir(path_analysis_to_rm) :
+                        try:
+                            rmtree (path_analysis_to_rm)
+                            print >> stderr, "[MSG]: Somatic Analysis folder remove to enable analysis to be relaunched ", path_analysis_to_rm
+                        except OSError:
+                            print >> stderr, "[ERROR]: Somatic Analysis folder couldn't be deleted ", path_analysis_to_rm
+                    else:
+                        print >> stderr, "[ERROR]: Somatic Analysis folder couldn't be found ", path_analysis_to_rm
 
 def bamDeleted(folder) :
     noBam = True
