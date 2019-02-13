@@ -3,4 +3,4 @@ bam-analysis/
 *.log
 *.sql
 listBams.py
-runPending*
+*md
