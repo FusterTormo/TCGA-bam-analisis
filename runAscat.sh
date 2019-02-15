@@ -64,7 +64,7 @@ if (( $# == 4 )); then
 	cd ~/soft/AscatNGS/bin
 	sta=`date`
 	SECONDS=0
-	$ascat -outdir $outDir -tumour $tumor -normal $normal -reference $reference -snp_gc $snpGC -protocol WXS -gender $sex -genderChr chrY -platform $platform -species $specie -assembly $assembly -cpus 8 -nobigwig -noclean
+	$ascat -outdir $outDir -tumour $tumor -normal $normal -reference $reference -snp_gc $snpGC -protocol WXS -gender $sex -genderChr chrY -platform $platform -species $specie -assembly $assembly -cpus 8 -nobigwig
 
 	if (( $? == 0 )); then
 		echo -e "\n\n${GREEN}AscatNGS ran successfully.${NC} Running the analysis\n\n"
