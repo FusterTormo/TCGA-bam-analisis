@@ -4,9 +4,9 @@ import os
 import masterScriptConstants as msc
 
 #Constants
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches"
+batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KIRP_20190201"
-batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KICH_20190206"
+# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_READ_20190215"
 
 scriptsFolder = "/g/strcombio/fsupek_cancer2/sc_repo"
 jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "50:00"],
@@ -16,7 +16,7 @@ jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "50:00"],
         # "excavator" : ["20", "1G", "excavator2_", "01:30:00"], # dropped from the tools to run 2019/02/01
         # "manta" : ["6", "2G", "mantaG_", "01:30:00"], # dropped from the tools to run 2019/02/01
         "mantaS" : ["6", "2G", "mantaS_", "03:00:00"],
-        "facets" : ["1", "14G", "facets_", "02:00:00"],
+        "facets" : ["1", "14G", "facets_", "05:00:00"],
         # "ascat" : ["2", "16G", "ascat_", "14:00:00"],
 	# "ascat" : ["2", "22G", "ascat_", "14:00:00"], # dropped from the tools to run 2019/02/01
         "msi" : ["10", "1G", "msisensor_", "01:00:00"],
@@ -37,6 +37,7 @@ jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "50:00"],
 
 ## OJO!!!!!
 ## Time limit suppressed 21/12/2018 to avoid jobs to be cancelled due to time limit 
+## Time limit used again from 15/02/2019, raise priority
 
 def getHeader(id, cpus, ram, log, timeSpent) :
     str = "#!/usr/bin/bash\n\
@@ -57,8 +58,8 @@ def getHeader(id, cpus, ram, log, timeSpent) :
 #\n\
 # Specify the minimum memory required per allocated CPU\n\
 #SBATCH --mem={}\n\
-# # Specify the maximum time the job can spend\n\
-# #SBATCH --time={}\n\
+# Specify the maximum time the job can spend\n\
+#SBATCH --time={}\n\
 #\n\
 # Force the jobs to be run in old node (temporal solution for concurrent IO problems from the 2 servers to synology)\n\
 # #SBATCH -w fsupeksvr\n\
