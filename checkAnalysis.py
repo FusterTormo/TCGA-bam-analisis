@@ -334,7 +334,9 @@ def getStats(cancer, askBash = True) :
         print "\nINFO: List of pending analyses stored in ./pending.md"
         opt = raw_input("Create bash to execute all pending analyses? (y/n): ")
         opt_batch = raw_input("Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
-        opt_list_analysis = raw_input("Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+
+        if opt_batch == 'y' or opt == 'Y':
+            opt_list_analysis = raw_input("Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
 
         if opt == 'y' or opt == 'Y':
             writeBash(allPending)

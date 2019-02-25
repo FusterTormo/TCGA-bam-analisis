@@ -7,20 +7,22 @@ import masterScriptConstants as msc
 batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KIRP_20190201"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_READ_20190215"
+# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_THCA_20190219"
+# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_BRCA_20190220"
 
 scriptsFolder = "/g/strcombio/fsupek_cancer2/sc_repo"
-jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "50:00"],
-        "strelkaS" : ["8", "2G", "strelka2S_", "50:00"],
-        "platypus" : ["1", "1G", "platypus_", "50:00"],
-        # "cnvkit" : ["8", "10G", "cnvkit_" , "30:00"], # dropped from the tools to run 2019/02/01
-        # "excavator" : ["20", "1G", "excavator2_", "01:30:00"], # dropped from the tools to run 2019/02/01
-        # "manta" : ["6", "2G", "mantaG_", "01:30:00"], # dropped from the tools to run 2019/02/01
-        "mantaS" : ["6", "2G", "mantaS_", "03:00:00"],
-        "facets" : ["1", "14G", "facets_", "05:00:00"],
-        # "ascat" : ["2", "16G", "ascat_", "14:00:00"],
-	# "ascat" : ["2", "22G", "ascat_", "14:00:00"], # dropped from the tools to run 2019/02/01
-        "msi" : ["10", "1G", "msisensor_", "01:00:00"],
-        "cov" : ["1", "10G", "bedtoolsCov_", "02:30:00"]}
+jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "02:00:00"],
+             "strelkaS" : ["8", "2G", "strelka2S_", "02:00:00"],
+             "platypus" : ["1", "1G", "platypus_", "50:00"],
+             # "cnvkit" : ["8", "10G", "cnvkit_" , "30:00"], # dropped from the tools to run 2019/02/01
+             # "excavator" : ["20", "1G", "excavator2_", "01:30:00"], # dropped from the tools to run 2019/02/01
+             # "manta" : ["6", "2G", "mantaG_", "01:30:00"], # dropped from the tools to run 2019/02/01
+             "mantaS" : ["6", "2G", "mantaS_", "03:00:00"],
+             "facets" : ["1", "1G", "facets_", "05:00:00"],
+             # "ascat" : ["2", "16G", "ascat_", "14:00:00"],
+	         # "ascat" : ["2", "22G", "ascat_", "14:00:00"], # dropped from the tools to run 2019/02/01
+             "msi" : ["10", "1G", "msisensor_", "01:00:00"],
+             "cov" : ["1", "10G", "bedtoolsCov_", "02:30:00"]}
 
 # modified to increase time of execution due to synology problem (cancer3)
 #jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "04:00:00"],

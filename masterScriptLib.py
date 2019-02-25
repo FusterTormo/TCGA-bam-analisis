@@ -50,6 +50,21 @@ def executeAnalysis(type, bam, folder, gender) :
             allOk = False
         if sc.runBedtools(bam, folder) != 0 :
             allOk = False
+    elif type == "dropped" :
+        if sc.runStrelka2Germline(bam, folder) != 0 :
+            allOk = False
+        if sc.runPlatypus(bam, folder) != 0 :
+            allOk = False
+        if sc.runStrelka2Somatic(bam, folder) != 0 :
+            allOk = False
+        if sc.runMSIsensor(bam, folder) != 0 :
+            allOk = False
+        if sc.runMantaSomatic(bam, folder) != 0 :
+            allOk = False
+        if sc.runFacets(bam, folder) != 0 :
+            allOk = False
+        if sc.runBedtools(bam, folder) != 0 :
+            allOk = False
     elif type == "vcall" :
         if sc.runStrelka2Germline(bam, folder) != 0 :
             allOk = False
@@ -112,7 +127,7 @@ def readParams(args) :
     analysis = ""
     deleteBams = "no"
     #Check if is params 2 and 3 (type of analysis and delete bams) are valid option
-    if args[2] not in ["all", "vcall", "cnv", "msi", "loh", "cov", "strelka", "strelkaS", "platypus", "cnvkit", "excavator", "manta", "mantaS", "facets", "ascat"] :
+    if args[2] not in ["all", "dropped" , "vcall", "cnv", "msi", "loh", "cov", "strelka", "strelkaS", "platypus", "cnvkit", "excavator", "manta", "mantaS", "facets", "ascat"] :
         print "ERROR: Bad second argument: {}".format(args[2])
         goodParams = False
     else :

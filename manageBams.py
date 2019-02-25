@@ -219,7 +219,7 @@ def GUI4local() :
     else :
         raise ValueError("Invalid path")
 
-    samps = raw_input("\nHow many samples you want to run? (1, 10, 100, all): ")
+    samps = raw_input("\nHow many samples you want to run? (1, 10, 100, all, pending): ")
     delBams = False
     lastItem = ""
     if samps == "1" or samps == "10" or samps == "100" :
@@ -228,7 +228,7 @@ def GUI4local() :
         if lastItem != "" :
             aux = samps
             samps = "all"
-    elif samps == "all" :
+    elif samps == "all" or "pending":
         delBams = raw_input("\nDelete the bams after successfull analysis? (y/n): ")
         if delBams == "y" :
             delBams = True
@@ -239,9 +239,23 @@ def GUI4local() :
     else :
         raise ValueError("Not supported option")
 
+    opt_analyses = raw_input(
+        "\nDo you want to run all the analyses or only the analyses after dropping tools (all/dropped): ")
+
     #Up to here, the three variables must be set: will have the cancer type, samps the number of samples to do the analysis, delBams a boolean to delete bams or not
     if samps == "all" :
         query = "SELECT DISTINCT p.submitter FROM patient p JOIN sample s ON s.submitter=p.submitter WHERE cancer='{}' AND deleted='No' ORDER BY p.submitter".format(opt)
+    elif samps == "pending":
+
+        if opt_analyses == "dropped" :
+            list_programs = mc.germlineProgramsDroppedTools + mc.somaticProgramsDroppedTools
+        else :
+            list_programs = mc.germlinePrograms + mc.somaticPrograms
+
+        print list_programs
+        # exit(1)
+        query = "SELECT DISTINCT submitter FROM sample WHERE uuid IN (SELECT uuid FROM analysis WHERE program IN ('{}') AND exitCode!=0 AND uuid IN (SELECT uuid FROM sample s JOIN patient p ON p.submitter=s.submitter WHERE cancer='{}'))".format("','".join(list_programs), opt)
+        print "************************************************"
     else :
         query = "SELECT DISTINCT p.submitter FROM patient p JOIN sample s ON s.submitter=p.submitter WHERE cancer='{}' AND deleted='No' ORDER BY p.submitter LIMIT {}".format(opt,samps)
 
@@ -259,11 +273,18 @@ def GUI4local() :
     if lastItem != "" :
         submitters = recover(submitters, lastItem, aux)
 
+    if opt_analyses not in ["all", "dropped"] :
+        print "ERROR: Not a valid option ", opt_analyses
+    else :
+        analyses = opt_analyses
+    # print "::::::::::::::::", submitters #del
+
     for s in submitters :
         if delBams :
-            ar = ["masterScriptLib.py", s, "all", "yes"]
+            ar = ["masterScriptLib.py", s, analyses, "yes"]
         else :
-            ar = ["masterScriptLib.py", s, "all", "no"]
+            print analyses #del
+            ar = ["masterScriptLib.py", s, analyses, "no"]
         st = time.time()
         ml.readParams(ar)
         elapsed = time.time() - st
