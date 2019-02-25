@@ -1,3 +1,18 @@
+from os.path import expanduser
+home = expanduser("~")
+
+home_jespinosa = '/home/jespinosa'
+home_ffuster = '/home/ffuster'
+
+if home == home_jespinosa:
+    pathScripts = home_jespinosa + "/git/bam-anal-isis/bash_scripts_conda"
+    pathMasterScript = home_jespinosa + "/Scripts/masterScriptLib.py"
+elif home == home_ffuster:
+    pathScripts = home_ffuster + "/Scripts"
+    pathMasterScript = home_ffuster + "/Scripts/masterScriptLib.py"
+else:
+    pathScripts = home_ffuster + "/Scripts"
+    pathMasterScript = home_ffuster + "/Scripts/masterScriptLib.py"
 
 pathToken = "/mnt/data/token.txt"
 pathDb = "/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db" #Absolute path where DB is stored
@@ -25,26 +40,25 @@ cancerPath = {"HNSC" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
 
 #
 #"PRAD" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
-pathScripts = "/home/ffuster/Scripts"
-# pathScripts = "/home/jespinosa/git/bam-anal-isis/bash_scripts_conda"
+
 pathSql = "local_analyses.sql"
 finish_file = ".finished"
 
-analyses = {"all" : "All analyses",
-     "vcall" : "Only variant calling (Strelka2 germinal, Platypus, Strelka2 somatic)",
-     "cnv" : "Only copy number (CNVkit, EXCAVATOR2, Manta germinal, Manta somatic)",
-     "msi" : "Only msi (MSIsensor)",
-     "loh" : "Only LOH (FACETS, AscatNGS)",
-     "cov" : "Only coverage (bedtools genomeCov)",
-     "strelka" : "Only run Strelka2 germline",
-     "strelkaS" : "Only run Strelka2 somatic",
-     "platypus" : "Only run Platypus",
-     "cnvkit" : "Only run CNVkit",
-     "excavator" : "Only run EXCAVATOR2",
-     "manta" : "Only run Manta germline",
-     "mantaS" : "Only run Manta somatic",
-     "facets" : "Only run FACETS",
-     "ascat" : "Only run AscatNGS"}
+analyses = { "all" : "All analyses",
+             "vcall" : "Only variant calling (Strelka2 germinal, Platypus, Strelka2 somatic)",
+             "cnv" : "Only copy number (CNVkit, EXCAVATOR2, Manta germinal, Manta somatic)",
+             "msi" : "Only msi (MSIsensor)",
+             "loh" : "Only LOH (FACETS, AscatNGS)",
+             "cov" : "Only coverage (bedtools genomeCov)",
+             "strelka" : "Only run Strelka2 germline",
+             "strelkaS" : "Only run Strelka2 somatic",
+             "platypus" : "Only run Platypus",
+             "cnvkit" : "Only run CNVkit",
+             "excavator" : "Only run EXCAVATOR2",
+             "manta" : "Only run Manta germline",
+             "mantaS" : "Only run Manta somatic",
+             "facets" : "Only run FACETS",
+             "ascat" : "Only run AscatNGS"}
 
 germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
 somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "MSIsensor"]
@@ -53,4 +67,3 @@ somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "M
 ## CNVkit, excavator, ascat, manta germline
 germlineProgramsDroppedTools = ["Strelka2 germline", "Platypus germline", "Bedtools genomeCov"]
 somaticProgramsDroppedTools = ["Strelka2 somatic", "FACETS", "Manta somatic", "MSIsensor"]
-
