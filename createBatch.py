@@ -2,16 +2,13 @@ import sqlite3
 import sys
 import os
 import masterScriptConstants as msc
+import time
+
+date_string = time.strftime("%Y,%m,%d")
+date = date_string.replace(",", "")
 
 #Constants
-batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_test"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches__20190201"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KIRP_20190201"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_READ_20190215"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_THCA_20190219"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_BRCA_20190220"
-# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_GBM_20190226"
-
+batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches"
 scriptsFolder = "/g/strcombio/fsupek_cancer2/sc_repo"
 
 def getHeader(id, cpus, ram, log, timeSpent) :
@@ -52,13 +49,27 @@ def run(cancer) :
     opt = raw_input("For which analyses you want to create batch scripts? (" + list_options + "): ")
     opt = opt.lower()
 
-    # if opt not in ('all', 'dropped', 'strelka') :
     if opt not in msc.job_specs.keys():
         raise KeyError("Invalid option for batch scripts")
     else :
         jobSpecs = msc.job_specs[opt]
 
-    partial = "{}/run{}to{}_{}_{}.sh".format(batchFolder, count, hundreds, opt, cancer)
+    batch_folder = "{}_{}_{}".format(batchFolder, cancer, date)
+
+    if not os.path.exists(batch_folder):
+         os.makedirs(batch_folder)
+         print >> sys.stderr, "INFO: batchFolder created: ", batch_folder
+
+    batch_folder_opt = "{}/{}".format(batch_folder, opt)
+
+    if not os.path.exists(batch_folder_opt):
+         os.makedirs(batch_folder_opt)
+         print >> sys.stderr, "INFO: batchFolder created: ", batch_folder_opt
+    else:
+         print >> sys.stderr, "ERROR: batchFolder already exists ", batch_folder_opt
+         sys.exit(0)
+
+    partial = "{}/run{}to{}_{}_{}.sh".format(batch_folder_opt, count, hundreds, opt, cancer)
     print "INFO: Getting submitter IDs for {}".format(cancer)
     with db :
         c = db.cursor()
@@ -66,11 +77,11 @@ def run(cancer) :
         a = c.execute(q)
         submitters = a.fetchall()
     for i in submitters :
-        bash = "{}/runAll_{}_{}_samples.sh".format(batchFolder, opt, cancer)
+        bash = "{}/runAll_{}_{}_samples.sh".format(batch_folder_opt, opt, cancer)
         count += 1
         if count % 100 == 0 :
             hundreds += 100
-            partial = "{}/run{}to{}_{}_{}.sh".format(batchFolder, count, hundreds, opt, cancer)
+            partial = "{}/run{}to{}_{}_{}.sh".format(batch_folder_opt, count, hundreds, opt, cancer)
 
         if not os.path.isfile(bash) :
             with open(bash, "w") as fi :
@@ -82,7 +93,7 @@ def run(cancer) :
 
         for k in jobSpecs.keys() :
             head = getHeader(i[0], jobSpecs[k][0], jobSpecs[k][1], jobSpecs[k][2], jobSpecs[k][3])
-            batchFile = "{}/batch_{}_{}.sh".format(batchFolder,i[0], k)
+            batchFile = "{}/batch_{}_{}.sh".format(batch_folder_opt,i[0], k)
 
             with open(batchFile, "w") as fi :
                 fi.write(head)
@@ -94,7 +105,7 @@ def run(cancer) :
             with open(partial, "a") as fi :
                 fi.write("sbatch {}\n".format(batchFile))
 
-    print "INFO: Batch files and bash to send the jobs created in {}".format(batchFolder)
+    print "INFO: Batch files and bash to send the jobs created in {}".format(batch_folder_opt)
 
 def main() :
     print "UNDER CONSTRUCTION"
