@@ -4,42 +4,15 @@ import os
 import masterScriptConstants as msc
 
 #Constants
-batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches"
+batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_test"
+# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches__20190201"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_KIRP_20190201"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_READ_20190215"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_THCA_20190219"
 # batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_BRCA_20190220"
+# batchFolder = "/g/strcombio/fsupek_cancer2/TCGA_bam/batches_GBM_20190226"
 
 scriptsFolder = "/g/strcombio/fsupek_cancer2/sc_repo"
-jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "02:00:00"],
-             "strelkaS" : ["8", "2G", "strelka2S_", "02:00:00"],
-             "platypus" : ["1", "1G", "platypus_", "50:00"],
-             # "cnvkit" : ["8", "10G", "cnvkit_" , "30:00"], # dropped from the tools to run 2019/02/01
-             # "excavator" : ["20", "1G", "excavator2_", "01:30:00"], # dropped from the tools to run 2019/02/01
-             # "manta" : ["6", "2G", "mantaG_", "01:30:00"], # dropped from the tools to run 2019/02/01
-             "mantaS" : ["6", "2G", "mantaS_", "03:00:00"],
-             "facets" : ["1", "1G", "facets_", "05:00:00"],
-             # "ascat" : ["2", "16G", "ascat_", "14:00:00"],
-	         # "ascat" : ["2", "22G", "ascat_", "14:00:00"], # dropped from the tools to run 2019/02/01
-             "msi" : ["10", "1G", "msisensor_", "01:00:00"],
-             "cov" : ["1", "10G", "bedtoolsCov_", "02:30:00"]}
-
-# modified to increase time of execution due to synology problem (cancer3)
-#jobSpecs = { "strelka" : ["8", "2G", "strelka2G_", "04:00:00"],
-#        "strelkaS" : ["8", "2G", "strelka2S_", "04:00:00"],
-#        "platypus" : ["1", "1G", "platypus_", "04:00:00"],
-#        "cnvkit" : ["8", "10G", "cnvkit_" , "03:00:00"],
-#        "excavator" : ["20", "1G", "excavator2_", "06:00:00"],
-#        "manta" : ["6", "2G", "mantaG_", "06:00:00"],
-#        "mantaS" : ["6", "2G", "mantaS_", "12:00:00"],
-#        "facets" : ["1", "1G", "facets_", "10:00:00"],
-#        "ascat" : ["2", "16G", "ascat_", "40:00:00"],
-#        "msi" : ["10", "1G", "msisensor_", "04:00:00"],
-#        "cov" : ["1", "10G", "bedtoolsCov_", "10:30:00"]}
-
-## OJO!!!!!
-## Time limit suppressed 21/12/2018 to avoid jobs to be cancelled due to time limit 
-## Time limit used again from 15/02/2019, raise priority
 
 def getHeader(id, cpus, ram, log, timeSpent) :
     str = "#!/usr/bin/bash\n\
@@ -73,7 +46,19 @@ def run(cancer) :
     db = sqlite3.connect(msc.pathDb)
     count = 0
     hundreds = 100
-    partial = "{}/run{}to{}_{}.sh".format(batchFolder, count, hundreds, cancer)
+
+    list_options = ', '.join(msc.job_specs.keys())
+
+    opt = raw_input("For which analyses you want to create batch scripts? (" + list_options + "): ")
+    opt = opt.lower()
+
+    # if opt not in ('all', 'dropped', 'strelka') :
+    if opt not in msc.job_specs.keys():
+        raise KeyError("Invalid option for batch scripts")
+    else :
+        jobSpecs = msc.job_specs[opt]
+
+    partial = "{}/run{}to{}_{}_{}.sh".format(batchFolder, count, hundreds, opt, cancer)
     print "INFO: Getting submitter IDs for {}".format(cancer)
     with db :
         c = db.cursor()
@@ -81,11 +66,11 @@ def run(cancer) :
         a = c.execute(q)
         submitters = a.fetchall()
     for i in submitters :
-        bash = "{}/runAll{}samples.sh".format(batchFolder, cancer)
+        bash = "{}/runAll_{}_{}_samples.sh".format(batchFolder, opt, cancer)
         count += 1
         if count % 100 == 0 :
             hundreds += 100
-            partial = "{}/run{}to{}_{}.sh".format(batchFolder, count, hundreds, cancer)
+            partial = "{}/run{}to{}_{}_{}.sh".format(batchFolder, count, hundreds, opt, cancer)
 
         if not os.path.isfile(bash) :
             with open(bash, "w") as fi :
@@ -98,6 +83,7 @@ def run(cancer) :
         for k in jobSpecs.keys() :
             head = getHeader(i[0], jobSpecs[k][0], jobSpecs[k][1], jobSpecs[k][2], jobSpecs[k][3])
             batchFile = "{}/batch_{}_{}.sh".format(batchFolder,i[0], k)
+
             with open(batchFile, "w") as fi :
                 fi.write(head)
                 fi.write("srun python {}/masterScript-2.py {} {} no\n".format(scriptsFolder, i[0], k))

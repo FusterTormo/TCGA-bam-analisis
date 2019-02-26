@@ -60,6 +60,52 @@ analyses = { "all" : "All analyses",
              "facets" : "Only run FACETS",
              "ascat" : "Only run AscatNGS"}
 
+## Jobs specification for slurm batches
+## Germline analyses resources
+strelka_germline_r = ["8", "2G", "strelka2G_", "03:00:00"]
+platypus_r = ["1", "1G", "platypus_", "50:00"]
+bedtools_cov_r =  ["1", "10G", "bedtoolsCov_", "02:30:00"]
+cnvkit_r = ["8", "10G", "cnvkit_" , "30:00"]
+excavator_r = ["20", "1G", "excavator2_", "01:30:00"]
+manta_germline_r = ["6", "2G", "mantaG_", "01:30:00"]
+
+## Somatic analyses resources
+strelka_somatic_r = ["8", "2G", "strelka2S_", "03:00:00"]
+manta_somatic_r = ["6", "2G", "mantaS_", "03:00:00"]
+facets_r = ["1", "1G", "facets_", "05:00:00"]
+ascat_r = ["2", "22G", "ascat_", "14:00:00"]
+msi_r = ["10", "1G", "msisensor_", "01:00:00"]
+
+job_specs = {'all' :  {  "strelka" : strelka_germline_r,
+                        "strelkaS" : strelka_somatic_r,
+                        "platypus" : platypus_r,
+                        "cnvkit" : cnvkit_r,
+                        "excavator" : excavator_r,
+                        "manta" : manta_germline_r,
+                        "mantaS" : manta_somatic_r,
+                        "facets" : facets_r,
+                        "ascat" : ascat_r,
+                        "msi" : msi_r,
+                        "cov" : bedtools_cov_r },
+            ## dropped from the tools to run 2019/02/01
+            'dropped' :{"strelka" : strelka_germline_r,
+                        "strelkaS" : strelka_somatic_r,
+                        "platypus" : platypus_r,
+                        "mantaS" : manta_somatic_r,
+                        "facets" : facets_r,
+                        "msi" : msi_r,
+                        "cov" : bedtools_cov_r },
+            ## only strelka run 2019/02/26
+            'strelka' :{"strelka" : strelka_germline_r,
+                        "strelkaS" : strelka_somatic_r },
+            ## complentary strelka run 2019/02/26
+            'not_strelka' :{"platypus" : platypus_r,
+                        "mantaS" : manta_somatic_r,
+                        "facets" : facets_r,
+                        "msi" : msi_r,
+                        "cov" : bedtools_cov_r }
+            }
+
 germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
 somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "MSIsensor"]
 
