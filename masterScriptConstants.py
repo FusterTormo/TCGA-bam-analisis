@@ -6,7 +6,7 @@ home_ffuster = '/home/ffuster'
 
 if home == home_jespinosa:
     pathScripts = home_jespinosa + "/git/bam-anal-isis/bash_scripts_conda"
-    pathMasterScript = home_jespinosa + "/Scripts/masterScriptLib.py"
+    pathMasterScript = home_jespinosa + "/git/bam-anal-isis/masterScriptLib.py"
 elif home == home_ffuster:
     pathScripts = home_ffuster + "/Scripts"
     pathMasterScript = home_ffuster + "/Scripts/masterScriptLib.py"
