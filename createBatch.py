@@ -49,20 +49,22 @@ def run(cancer) :
     opt = raw_input("For which analyses you want to create batch scripts? (" + list_options + "): ")
     opt = opt.lower()
 
-    if opt not in msc.job_specs.keys():
+    if opt not in msc.job_specs.keys() :
         raise KeyError("Invalid option for batch scripts")
     else :
         jobSpecs = msc.job_specs[opt]
 
     batch_folder = "{}_{}_{}".format(batchFolder, cancer, date)
 
-    if not os.path.exists(batch_folder):
+    if not os.path.exists(batch_folder) :
          os.makedirs(batch_folder)
          print >> sys.stderr, "INFO: batchFolder created: ", batch_folder
+    else :
+        print >> sys.stderr, "INFO: batchFolder already exists: ", batch_folder
 
     batch_folder_opt = "{}/{}".format(batch_folder, opt)
 
-    if not os.path.exists(batch_folder_opt):
+    if not os.path.exists(batch_folder_opt) :
          os.makedirs(batch_folder_opt)
          print >> sys.stderr, "INFO: batchFolder created: ", batch_folder_opt
     else:
@@ -76,6 +78,7 @@ def run(cancer) :
         q = "SELECT submitter FROM patient WHERE cancer='{}'".format(cancer)
         a = c.execute(q)
         submitters = a.fetchall()
+
     for i in submitters :
         bash = "{}/runAll_{}_{}_samples.sh".format(batch_folder_opt, opt, cancer)
         count += 1
