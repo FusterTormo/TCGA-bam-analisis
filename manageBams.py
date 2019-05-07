@@ -252,10 +252,10 @@ def GUI4local() :
         else :
             list_programs = mc.germlinePrograms + mc.somaticPrograms
 
-        print list_programs
+        # print list_programs
         # exit(1)
         query = "SELECT DISTINCT submitter FROM sample WHERE uuid IN (SELECT uuid FROM analysis WHERE program IN ('{}') AND exitCode!=0 AND uuid IN (SELECT uuid FROM sample s JOIN patient p ON p.submitter=s.submitter WHERE cancer='{}'))".format("','".join(list_programs), opt)
-        print "************************************************"
+
     else :
         query = "SELECT DISTINCT p.submitter FROM patient p JOIN sample s ON s.submitter=p.submitter WHERE cancer='{}' AND deleted='No' ORDER BY p.submitter LIMIT {}".format(opt,samps)
 
@@ -277,13 +277,14 @@ def GUI4local() :
         print "ERROR: Not a valid option ", opt_analyses
     else :
         analyses = opt_analyses
+
     # print "::::::::::::::::", submitters #del
 
     for s in submitters :
         if delBams :
             ar = ["masterScriptLib.py", s, analyses, "yes"]
         else :
-            print analyses #del
+            # print analyses #del
             ar = ["masterScriptLib.py", s, analyses, "no"]
         st = time.time()
         ml.readParams(ar)

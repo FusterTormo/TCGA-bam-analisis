@@ -128,7 +128,7 @@ def write_finished(path):
 
 def already_run(path_to_analysis):
     if os.path.isfile(path_to_analysis + "/" + finish_file):
-        print >> sys.stderr, "#############", path_to_analysis + "/" + finish_file
+        print >> sys.stderr, "#############", path_to_analysis + "/" + finish_file #del
         return True
     else:
         if os.path.isdir(path_to_analysis):
@@ -352,7 +352,7 @@ def runStrelka2Somatic(bam, folder):
     tc = getPair(bam, "Strelka2")
 
     if tc != None:
-        #        if os.path.isdir(tc["folder"]) :
+        # if os.path.isdir(tc["folder"]) :
         if already_run(tc["folder"]):
             print >> sys.stderr, "WARNING:  Strelka2 somatic analysis was succesfully run before. Skipping"
         else:
@@ -534,7 +534,7 @@ def runFacets(bam, folder):
     exitCode = 0
 
     if tc != None:
-        #        if os.path.isdir(tc["folder"]) :
+        # if os.path.isdir(tc["folder"]) :
         if already_run(tc["folder"]):
             print >> sys.stderr, "WARNING: FACETS was succesfully run before. Skipping"
         else:
