@@ -7,14 +7,19 @@ import stat
 import fnmatch
 from shutil import rmtree, copyfile
 from sys import stderr, exit
+import csv
 
-germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
-somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "MSIsensor"]
-
-### List of tools updated until dropping the ones that are not use anymore (2019/02/01)
-## CNVkit, excavator, ascat, manta germline
-germlineProgramsDroppedTools = ["Strelka2 germline", "Platypus germline", "Bedtools genomeCov"]
-somaticProgramsDroppedTools = ["Strelka2 somatic", "FACETS", "Manta somatic", "MSIsensor"]
+# germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
+# somaticPrograms = ["Strelka2 somatic", "AscatNGS", "FACETS", "Manta somatic", "MSIsensor"]
+#
+# ### List of tools updated until dropping the ones that are not use anymore (2019/02/01)
+# ## CNVkit, excavator, ascat, manta germline
+# germlineProgramsDroppedTools = ["Strelka2 germline", "Platypus germline", "Bedtools genomeCov"]
+# somaticProgramsDroppedTools = ["Strelka2 somatic", "FACETS", "Manta somatic", "MSIsensor"]
+germlinePrograms = mc.germlinePrograms
+somaticPrograms = mc.somaticPrograms
+germlineProgramsDroppedTools = mc.germlineProgramsDroppedTools
+somaticProgramsDroppedTools = mc.somaticProgramsDroppedTools
 
 def getPairs(case) :
     '''Looks for how many tumor samples and normal samples has the case Id passed as parameter.
@@ -117,6 +122,11 @@ def checkGermline(cases, analyses, germlineProgramsC) :
     return pending
 
 def checkSomatic(case, uuids, analyses, somaticProgramsC) :
+    # print "----------------------------", case, uuids, analyses, somaticProgramsC
+    # case TCGA-CJ-6033
+    # uuids 74b4b8aa-a9e4-4fec-9876-7c2683d3f98a', '4a3ab90a-b8f8-4d43-a3bb-c69e1e8fbca8'
+    # analyses 9457c2cf_VS_507c6331
+    # Strelka2 somatic, 0
     pending = []
     comb = getPairs(case)
     for c in comb :
@@ -161,7 +171,22 @@ def getDeletedBams(cases) :
 
     return (deleted, pending)
 
-def removeBams(cases) :
+def bam_to_keep(file_bam="/home/jespinosa/git/bam-anal-isis/data/strelkaGerm_matchedSamplesToCCLs_hg38.csv", id=None):
+    with open(file_bam) as file_bam_to_keep:
+        bam_to_keep_r = csv.reader(file_bam_to_keep, delimiter=',')
+
+        for line in bam_to_keep_r:
+            if line[0] == id:
+                return True
+
+        return False
+
+def list_bams_to_rm(cases) :
+    date = time.strftime("%Y%m%d_%H%M%S")
+    log_to_rm_name = "files_to_delete_" + date + ".info"
+
+    log_to_rm = open(log_to_rm_name, "w")
+
     db = sqlite3.connect(mc.pathDb)
     for c in cases :
         query = "SELECT cancer, s.submitter, uuid, bamName FROM sample s JOIN patient p ON s.submitter=p.submitter WHERE s.submitter='{}'".format(c)
@@ -171,23 +196,66 @@ def removeBams(cases) :
             bams = x.fetchall()
         for b in bams :
             path = "{}/{}/{}/{}/{}".format(mc.cancerPath[b[0]], b[0], b[1], b[2], b[3])
-            try :
-                if os.path.isfile(path) :
-                    print "INFO: Deleting the bam {}".format(path)
-                    os.remove(path)
-                    #Remove the bai, too
-                    baiPath = path[0:-1] + 'i'
-                    if os.path.isfile(baiPath) :
-                        os.remove(baiPath)
-            except OSError, e:
-               print "ERROR: Unable to remove {}.\nDescription:\n\t{}".format(path, e)
-            with db :
-                cur = db.cursor()
-                query = "UPDATE sample SET deleted='Yes' WHERE uuid='{}'".format(b[2])
+
+            if bam_to_keep(id=b[1]):
+                print >> stderr, "INFO: Bam to keep {}".format(path)
+                log_to_rm.write("INFO: Bam to keep {}\n".format(path))
+            else:
                 try :
-                    x = cur.execute(query)
-                except sqlite3.OperationalError, e :
-                    print "ERROR: Error while executing the query {}.\nDescription:\n\t{}".format(e)
+                    if os.path.isfile(path) :
+                        print >> stderr, "INFO: Bam to delete {}".format(path)
+                        log_to_rm.write("INFO: Bam to delete {}\n".format(path))
+                except OSError, e:
+                   print >> stderr, "ERROR: Bam file to remove {} not found.\nDescription:\n\t{}".format(path, e)
+
+    log_to_rm.close()
+
+def removeBams(cases):
+
+    date = time.strftime("%Y%m%d_%H%M%S")
+    log_del_name = "deleted_"+ date + ".log"
+
+    log_deleted = open(log_del_name, "w")
+
+    db = sqlite3.connect(mc.pathDb)
+    for c in cases:
+        query = "SELECT cancer, s.submitter, uuid, bamName FROM sample s JOIN patient p ON s.submitter=p.submitter WHERE s.submitter='{}'".format(c)
+
+        with db:
+            cur = db.cursor()
+            x = cur.execute(query)
+            bams = x.fetchall()
+        for b in bams:
+            path = "{}/{}/{}/{}/{}".format(mc.cancerPath[b[0]], b[0], b[1], b[2], b[3])
+
+            if bam_to_keep(id=b[1]):
+                print "INFO: Bam kept for posterior analysis {}".format(path)
+                log_deleted.write("INFO: Bam kept for posterior analysis {}\n".format(path))
+            else:
+                try:
+                    if os.path.isfile(path):
+                        print "INFO: Deleting the bam {}".format(path)
+                        os.remove(path)
+                        log_deleted.write("INFO: Deleting the bam {}\n".format(path))
+                        #Remove the bai, too
+                        baiPath = path[0:-1] + 'i'
+                        if os.path.isfile(baiPath) :
+                            os.remove(baiPath)
+                except OSError, e:
+                    print "ERROR: Unable to remove {}.\nDescription:\n\t{}".format(path, e)
+                    log_deleted.write("ERROR: Unable to remove {}.\nDescription:\n\t{}\n".format(path, e))
+
+                with db:
+                    cur = db.cursor()
+                    query = "UPDATE sample SET deleted='Yes' WHERE uuid='{}'".format(b[2])
+
+                    try:
+                        x = cur.execute(query)
+                    except sqlite3.OperationalError, e:
+                        print "ERROR: Error while executing the query {}.\nDescription:\n\t{}".format(e)
+                        log_deleted.write(log_deleted.write("ERROR: Unable to remove {}.\nDescription:\n\t{}\n".format(path, e)))
+
+    log_deleted.close()
 
 def checkSamples(cancer, askRemove = False, askBash = True) :
     done = []
@@ -234,6 +302,9 @@ def checkSamples(cancer, askRemove = False, askBash = True) :
         opt = raw_input("Remove analysed bams? (y/n) ")
         if opt == "y" or opt == "Y" :
             removeBams(done)
+            # list_bams_to_rm(done)
+        else:
+            list_bams_to_rm(done)
 
 def getErrorsInAnalysis(submitter, uuids, gDict, sDict) :
     comb = getPairs(submitter)
@@ -333,24 +404,31 @@ def getStats(cancer, askBash = True) :
     if askBash :
         print "\nINFO: List of pending analyses stored in ./pending.md"
         opt = raw_input("Create bash to execute all pending analyses? (y/n): ")
-        opt_batch = raw_input("Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
+        # opt_batch = raw_input("Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
 
-        if opt_batch == 'y' or opt == 'Y':
+        if opt == 'y' or opt == 'Y' or opt_batch == 'y' or opt_batch == 'Y' :
             opt_list_analysis = raw_input("Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
 
         if opt == 'y' or opt == 'Y':
-            writeBash(allPending)
-            print "\nINFO: Bash script stored as ./runPending.sh"
-        if opt_batch == 'y' or opt_batch == 'Y':
-            # moveBatchScripts(allPending, cancer) #del
-            print "\nINFO: Batch scripts have been moved"
-
             if opt_list_analysis =='y' or opt_list_analysis =='Y':
-                moveBatchScripts(allPending, cancer, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
-                print "\nINFO: Batch scripts have been moved"
+                writeBash(allPending, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
+                # writeBash(allPending)
             else:
-                moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
-                print "\nINFO: Batch scripts have been moved"
+                # moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
+                writeBash(allPending, germlinePrograms, somaticPrograms)
+
+            print "\nINFO: Bash script stored as ./runPending.sh"
+
+        # if opt_batch == 'y' or opt_batch == 'Y':
+        #     # moveBatchScripts(allPending, cancer) #del
+        #     print "\nINFO: Batch scripts have been moved"
+        #
+        #     if opt_list_analysis =='y' or opt_list_analysis =='Y':
+        #         moveBatchScripts(allPending, cancer, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
+        #         print "\nINFO: Batch scripts have been moved"
+        #     else:
+        #         moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
+        #         print "\nINFO: Batch scripts have been moved"
 
 def writePending(samples, cancer, doGetBamsScript) :
     path = "{}/{}".format(mc.cancerPath[cancer], cancer)
@@ -436,7 +514,8 @@ def writePending(samples, cancer, doGetBamsScript) :
 
         print "WARNING: Found deleted bams on cases where not all analyses where performed. Created bash script in {} folder to download these samples".format(path)
 
-def writeBash(samples) :
+# def writeBash(samples) :
+def writeBash(samples, germlineProgramsM, somaticProgramsM) :
     #TODO mover los bash scripts que queden pendientes
     #print samples # Imprime una lista. Cada elemento de la lista es una lista compuesta por el uuid [uuid2 si el analisis es somatico] y el nombre del programa que queda pendiente
     #Consulta a la base de datos para recoger el submitter
@@ -444,20 +523,26 @@ def writeBash(samples) :
 
     #TODO crear una funcion para borrar las carpetas de todos los analisis que no han funcionado
     #Dictionary to convert the name stored in the database for the program to the name used in masterSciptLib
-    convert2master = {"Strelka2 germline" : "strelka", "Platypus germline" : "platypus", "EXCAVATOR2" : "excavator", "CNVkit" : "cnvkit",
-     "Manta germline" : "manta", "Bedtools genomeCov" : "cov", "Strelka2 somatic" : "strelkaS", "AscatNGS" : "ascat", "FACETS" : "facets",
-     "Manta somatic" : "mantaS", "MSIsensor" : "msi"}
+    convert2master = {"Strelka2 germline" : "strelka", "Platypus germline" : "platypus", "EXCAVATOR2" : "excavator",
+                      "CNVkit" : "cnvkit", "Manta germline" : "manta", "Bedtools genomeCov" : "cov",
+                      "Strelka2 somatic" : "strelkaS", "AscatNGS" : "ascat", "FACETS" : "facets",
+                      "Manta somatic" : "mantaS", "MSIsensor" : "msi"}
+
     filename = "runPending.sh"
-    pathMasterScript = "/home/ffuster/Scripts/masterScriptLib.py"
+    # pathMasterScript = "/home/ffuster/Scripts/masterScriptLib.py"
+    pathMasterScript = mc.pathMasterScript
+
     with open(filename, "w") as fi :
         fi.write("#!/bin/bash\n\n")
         for k, v in samples.iteritems() :
             if len(v[0]) > 0 :
                 for g in v[0] :
-                    fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[g[1]]))
+                    if g[1] in germlineProgramsM:
+                        fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[g[1]]))
             if len(v[1]) > 0 :
-                for s in v[1] :
-                    fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[s[2]]))
+                for s in v[1]:
+                    if s[2] in somaticProgramsM:
+                        fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[s[2]]))
 
     os.chmod(filename, stat.S_IRWXU)
 
