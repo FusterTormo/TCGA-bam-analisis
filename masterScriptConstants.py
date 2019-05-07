@@ -35,10 +35,11 @@ cancerPath = {"HNSC" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
         "PAAD" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
         # "READ" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
         "READ" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
-        "THCA" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+        # "THCA" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+        "THCA" : "/g/strcombio/fsupek_cancer2/TCGA_bam",
         "UCEC" : "/g/strcombio/fsupek_cancer3/TCGA_bam"}
 
-#
+
 #"PRAD" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
 
 pathSql = "local_analyses.sql"
@@ -65,7 +66,8 @@ analyses = { "all" : "All analyses",
 strelka_germline_r = ["8", "2G", "strelka2G_", "03:00:00"]
 platypus_r = ["1", "1G", "platypus_", "50:00"]
 bedtools_cov_r =  ["1", "10G", "bedtoolsCov_", "02:30:00"]
-cnvkit_r = ["8", "10G", "cnvkit_" , "30:00"]
+# cnvkit_r = ["8", "10G", "cnvkit_" , "30:00"]
+cnvkit_r = ["8", "10G", "cnvkit_" , "01:30:00"]
 excavator_r = ["20", "1G", "excavator2_", "01:30:00"]
 manta_germline_r = ["6", "2G", "mantaG_", "01:30:00"]
 
@@ -98,12 +100,14 @@ job_specs = {'all' :  {  "strelka" : strelka_germline_r,
             ## only strelka run 2019/02/26
             'strelka' :{"strelka" : strelka_germline_r,
                         "strelkaS" : strelka_somatic_r },
-            ## complentary strelka run 2019/02/26
+             ## complentary strelka run 2019/02/26
             'not_strelka' :{"platypus" : platypus_r,
                         "mantaS" : manta_somatic_r,
                         "facets" : facets_r,
                         "msi" : msi_r,
-                        "cov" : bedtools_cov_r }
+                        "cov" : bedtools_cov_r },
+            ## only cnvkit run 2019/03/06
+            'cnvkit': {"cnvkit": cnvkit_r }
             }
 
 germlinePrograms = ["Strelka2 germline", "Platypus germline", "EXCAVATOR2", "CNVkit", "Manta germline", "Bedtools genomeCov"]
