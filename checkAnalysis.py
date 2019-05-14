@@ -404,31 +404,22 @@ def getStats(cancer, askBash = True) :
     if askBash :
         print "\nINFO: List of pending analyses stored in ./pending.md"
         opt = raw_input("Create bash to execute all pending analyses? (y/n): ")
-        # opt_batch = raw_input("Do you want to move the batch files to run the pending analysis and remove the corresponding folders? (y/n): ")
 
-        if opt == 'y' or opt == 'Y' or opt_batch == 'y' or opt_batch == 'Y' :
+        if opt == 'y' or opt == 'Y':
             opt_list_analysis = raw_input("Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+            opt_slurm = raw_input("Script will run analyses in local by default, do you want to run it on slurm instead: (y/n)")
 
         if opt == 'y' or opt == 'Y':
             if opt_list_analysis =='y' or opt_list_analysis =='Y':
-                writeBash(allPending, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
-                # writeBash(allPending)
+                if opt_slurm == 'y' or opt == 'Y':
+                    writeBashBatch(cancer, allPending, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
+                else:
+                    writeBash(allPending, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
             else:
-                # moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
-                writeBash(allPending, germlinePrograms, somaticPrograms)
-
-            print "\nINFO: Bash script stored as ./runPending.sh"
-
-        # if opt_batch == 'y' or opt_batch == 'Y':
-        #     # moveBatchScripts(allPending, cancer) #del
-        #     print "\nINFO: Batch scripts have been moved"
-        #
-        #     if opt_list_analysis =='y' or opt_list_analysis =='Y':
-        #         moveBatchScripts(allPending, cancer, germlineProgramsDroppedTools, somaticProgramsDroppedTools)
-        #         print "\nINFO: Batch scripts have been moved"
-        #     else:
-        #         moveBatchScripts(allPending, cancer, germlinePrograms, somaticPrograms)
-        #         print "\nINFO: Batch scripts have been moved"
+                if opt_slurm == 'y' or opt == 'Y':
+                    writeBashBatch(cancer, allPending, germlinePrograms, somaticPrograms)
+                else:
+                    writeBash(allPending, germlinePrograms, somaticPrograms)
 
 def writePending(samples, cancer, doGetBamsScript) :
     path = "{}/{}".format(mc.cancerPath[cancer], cancer)
@@ -545,6 +536,33 @@ def writeBash(samples, germlineProgramsM, somaticProgramsM) :
                         fi.write("python {} {} {} no\n".format(pathMasterScript, k, convert2master[s[2]]))
 
     os.chmod(filename, stat.S_IRWXU)
+    print "\nINFO: Bash script stored as", filename
+
+def writeBashBatch(cancer, samples, germlineProgramsM, somaticProgramsM) :
+
+    #Dictionary to convert the name stored in the database for the program to the name used in masterSciptLib
+    convert2master = {"Strelka2 germline" : "strelka", "Platypus germline" : "platypus", "EXCAVATOR2" : "excavator",
+                      "CNVkit" : "cnvkit", "Manta germline" : "manta", "Bedtools genomeCov" : "cov",
+                      "Strelka2 somatic" : "strelkaS", "AscatNGS" : "ascat", "FACETS" : "facets",
+                      "Manta somatic" : "mantaS", "MSIsensor" : "msi"}
+
+    date = time.strftime("%Y%m%d")
+    filename = "run_errors_{}_{}.sh".format(cancer, date)
+
+    with open(filename, "w") as fi :
+        fi.write("#!/usr/bin/env bash\n\n")
+        for k, v in samples.iteritems() :
+            if len(v[0]) > 0 :
+                for g in v[0] :
+                    if g[1] in germlineProgramsM:
+                        fi.write("sbatch batch_{}_{}.sh\n".format(k, convert2master[g[1]]))
+            if len(v[1]) > 0 :
+                for s in v[1]:
+                    if s[2] in somaticProgramsM:
+                        fi.write("sbatch batch_{}_{}.sh\n".format(k, convert2master[s[2]]))
+    os.chmod(filename, stat.S_IRWXU)
+
+    print "\nINFO: Bash script stored as", filename
 
 def moveBatchScripts(samples, cancer, germlineProgramsM, somaticProgramsM) :
     #Dictionary to convert the name stored in the database for the program to the name used in masterSciptLib
