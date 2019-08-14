@@ -81,7 +81,7 @@ def GUIselectAnalysis() :
 
 def GUI4stats() :
     opt = GUIselectCancer()
-    ch.getStats(opt)
+    ch.getStats(opt, askBash=True)
 
 def doReports() :
     print "INFO: Preparing reports to all the cancers"
@@ -167,9 +167,10 @@ def GUI4dwSample() :
         print "ERROR: No bam uuids found in {} case".format(case)
 
 def GUI4newCancer() :
-    folderManifests = "/mnt/data/TCGA_bam" #Information extracted from tcgaAPI. If it doew not work look that the path is not changed...
-    serverFolder = "/g/strcombio/fsupek_cancer3/TCGA_bam"
-    getBam = "/home/ffuster/Scripts/getBams.sh"
+    folderManifests = "/mnt/data/TCGA_bam" #Information extracted from tcgaAPI. If it does not work look that the path is not changed...
+    serverFolder = "/g/strcombio/fsupek_cancer1/TCGA_bam"
+    # getBam = "/home/ffuster/Scripts/getBams.sh"
+    getBam = "/home/jespinosa/git/bam-anal-isis/getBams.sh"
     # Get available cancers
     avData = tcga.availableCancers()
     if avData != [] :
