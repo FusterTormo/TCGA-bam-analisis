@@ -44,6 +44,7 @@ cancerPath = { "HNSC" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "UVM"  : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "ACC"  : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "THYM" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
+               "PCPG" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "SKCM" : "/g/strcombio/fsupek_cancer3/TCGA_bam" }
 
 

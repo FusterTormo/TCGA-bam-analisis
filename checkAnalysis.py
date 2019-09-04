@@ -171,7 +171,8 @@ def getDeletedBams(cases) :
 
     return (deleted, pending)
 
-def bam_to_keep(file_bam="/home/jespinosa/git/bam-anal-isis/data/strelkaGerm_matchedSamplesToCCLs_hg38.csv", id=None):
+# def bam_to_keep(file_bam="/home/jespinosa/git/bam-anal-isis/data/strelkaGerm_matchedSamplesToCCLs_hg38.csv", id=None):
+def bam_to_keep(file_bam="/home/jespinosa/git/bam-anal-isis/data/jura_and_Fco2keep.csv", id=None):
     with open(file_bam) as file_bam_to_keep:
         bam_to_keep_r = csv.reader(file_bam_to_keep, delimiter=',')
 
@@ -340,6 +341,20 @@ def getErrorsInAnalysis(submitter, uuids, gDict, sDict) :
                         errors.append([submitter, a[0]])
     return errors
 
+'''
+    if askBash:
+        opt = raw_input(
+            "Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+
+    for s in subs :
+        if opt == 'y' or opt == 'Y':
+            pendingGermline = checkGermline(subs[s], gDict, germlineProgramsDroppedTools)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticProgramsDroppedTools)
+        else:
+            pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
+'''
+
 def getStats(cancer, askBash = True) :
     '''Return stats from the cancer passed as parameter. Some stats are:
     Number of samples pending to analyse
@@ -366,9 +381,20 @@ def getStats(cancer, askBash = True) :
     createAnalysisDict(cancer, subs, gDict, sDict)
     print "INFO: {} submitters found with bam files".format(len(subs))
 
+    if askBash:
+        opt = raw_input(
+            "Do you want to only check for these tools (genomeCov, PlatypusG, StrelkaG, StrelkaS,  MantaS, Facets and MSI) (y/n): ")
+
     for s in subs :
-        pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
-        pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
+        # pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
+        # pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
+        if opt == 'y' or opt == 'Y':
+            pendingGermline = checkGermline(subs[s], gDict, germlineProgramsDroppedTools)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticProgramsDroppedTools)
+        else:
+            pendingGermline = checkGermline(subs[s], gDict, germlinePrograms)
+            pendingSomatic = checkSomatic(s, subs[s], sDict, somaticPrograms)
+
         if len(pendingGermline) == 0 and len(pendingSomatic) == 0 :
             done.append(s)
         else :
