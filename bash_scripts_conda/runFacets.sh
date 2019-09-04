@@ -34,21 +34,11 @@ then
 	fi
 
 	#FACETS expects to have 2 bams: First the control and second the tumor
-	# $snpPileup -P100 $vcf $output2 $normal $tumor
-        snp-pileup -P100 $vcf $output2 $normal $tumor
+    snp-pileup -P100 $vcf $output2 $normal $tumor
 	printf 'Elapsed time -> %dh:%dm:%ds\n' $(($SECONDS/3600)) $(($SECONDS%3600/60)) $(($SECONDS%60))
 	
 	# $snpPileup $vcf $output $normal $tumor
 	snp-pileup $vcf $output $normal $tumor
-	
-	## Run facets
-	# Rscript $facets_sc  -c ${output} -o $3
-    # Rscript $facets_sc  -c ${output2} -o $3
-
-	# gzip csv files
-	## test with just one sample before uncommenting
-	gzip ${output}
-	gzip ${output2}
 
 	if (( $? == 0 ))
 	then
@@ -57,6 +47,23 @@ then
 		echo -e >&2 "\n${RED}Execution aborted. Check below possible errors${NC}\n"
 		exit 1
 	fi
+
+	# Gunzip result to save disk space
+	gzip ${output} ${output2}
+
+	if (( $? == 0 ))
+	then
+		echo -e "${GREEN}snp pileup csv files successfully compressed${NC}\n"
+	else
+		echo -e >&2 "\n${RED}snp pileup results not compressed. Check below possible errors${NC}\n"
+		exit 1
+	fi
+
+    ## Run facets
+	# Rscript $facets_sc  -c ${output} -o $3
+    # Rscript $facets_sc  -c ${output2} -o $3
+    ## In case of running facets, add a check for error and change the msg of elapsed time
+
 	end=`date`
 	echo -e "snp-pileup started at $sta\nEnded at $end"
 	printf 'Elapsed time -> %dh:%dm:%ds\n' $(($SECONDS/3600)) $(($SECONDS%3600/60)) $(($SECONDS%60))

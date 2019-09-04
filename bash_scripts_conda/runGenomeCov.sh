@@ -16,9 +16,6 @@ then
 	sta=`date`
 	$bedtools genomecov -bg -ibam $1 > bamCoverage.tsv
 
-	# Gunzip result to save disk space
-	gzip bamCoverage.tsv
-
 	if (( $? == 0 ))
 	then
 		echo -e "${GREEN}genomeCoverage ran successfully.${NC}\n"
@@ -27,6 +24,17 @@ then
 		conda deactivate
 		exit 1
 	fi
+
+	# Gunzip result to save disk space
+	gzip bamCoverage.tsv
+	if (( $? == 0 ))
+	then
+		echo -e "${GREEN}genomeCoverage result successfully compressed${NC}\n"
+	else
+		echo -e >&2 "\n${RED}genomeCoverage result not compressed. Check below possible errors${NC}\n"
+		exit 1
+	fi
+
 	end=`date`
 	echo -e "bedtools genomecov started at $sta\nEnded at $end"
 	printf 'Elapsed time -> %dh:%dm:%ds\n' $(($SECONDS/3600)) $(($SECONDS%3600/60)) $(($SECONDS%60))
