@@ -46,13 +46,28 @@ import sys
 # cType = 'ACC'
 # filer = 'clinical.project-TCGA-THYM.2019-08-12.json'
 # cType = 'THYM'
-filer = 'clinical.project-TCGA-PCPG.2019-08-14.json'
-cType = 'PCPG'
-# filer = 'clinical.project-TCGA-SKCM.2019-08-12.json'
+# filer = 'clinical.project-TCGA-PCPG.2019-08-14.json'
+# cType = 'PCPG'
+# filer = 'clinical.project-TCGA-SKCM.2019-09-06.json'
 # cType = 'SKCM'
+# filer = 'clinical.project-TCGA-LGG.2019-09-06.json'
+# cType = 'LGG'
+# filer = 'clinical.project-TCGA-TGCT.2019-09-06.json'
+# cType = 'TGCT'
+# filer = 'clinical.project-TCGA-PRAD.2019-09-25.json'
+# cType = 'PRAD'
+# sql = "clinical_data_PRAD.sql"
+# filer = 'clinical.project-TCGA-ESCA.2019-10-07.json'
+# cType = 'ESCA'
+# filer = 'clinical.project-TCGA-SARC.2019-10-11.json'
+# cType = 'SARC'
+# filer = 'clinical.project-TCGA-MESO.2019-10-11.json'
+# cType = 'MESO'
+filer = 'clinical.project-TCGA-LAML.2019-10-25.json'
+cType = 'LAML'
 
+sql = "clinical_data_LAML.sql"
 
-sql = "clinical_data.sql"
 print "Reading {} data".format(filer)
 with open(filer, 'r') as f :
   j = json.load(f)
