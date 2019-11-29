@@ -31,7 +31,7 @@ def getHeader(id, cpus, ram, log, timeSpent) :
 # Specify the minimum memory required per allocated CPU\n\
 #SBATCH --mem={}\n\
 # Specify the maximum time the job can spend\n\
-#SBATCH --time={}\n\
+# #SBATCH --time={}\n\
 #\n\
 # Force the jobs to be run in old node (temporal solution for concurrent IO problems from the 2 servers to synology)\n\
 # #SBATCH -w fsupeksvr\n\
@@ -43,6 +43,7 @@ def run(cancer) :
     db = sqlite3.connect(msc.pathDb)
     count = 0
     hundreds = 100
+    count_j = 0
 
     list_options = ', '.join(msc.job_specs.keys())
 
@@ -82,6 +83,7 @@ def run(cancer) :
     for i in submitters :
         bash = "{}/runAll_{}_{}_samples.sh".format(batch_folder_opt, opt, cancer)
         count += 1
+
         if count % 100 == 0 :
             hundreds += 100
             partial = "{}/run{}to{}_{}_{}.sh".format(batch_folder_opt, count, hundreds, opt, cancer)
@@ -95,6 +97,14 @@ def run(cancer) :
                 fi.write("#! /usr/bin/bash\n\n")
 
         for k in jobSpecs.keys() :
+            count_j += 1
+            if count_j % 70 == 0:
+                # print "Count {}".format(count)
+                with open(partial, "a") as fi:
+                    fi.write("sleep 3600\n")
+                with open(bash, "a") as fi:
+                    fi.write("sleep 3600\n")
+
             head = getHeader(i[0], jobSpecs[k][0], jobSpecs[k][1], jobSpecs[k][2], jobSpecs[k][3])
             batchFile = "{}/batch_{}_{}.sh".format(batch_folder_opt,i[0], k)
 
