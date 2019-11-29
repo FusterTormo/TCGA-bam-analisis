@@ -11,7 +11,7 @@ NC='\033[0m' # No Color
 
 if (( $# == 1 ))
 then
-	conda activate base
+	conda activate bedtools
 	SECONDS=0
 	sta=`date`
 	$bedtools genomecov -bg -ibam $1 > bamCoverage.tsv
