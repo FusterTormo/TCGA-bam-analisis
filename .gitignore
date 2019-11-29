@@ -5,3 +5,7 @@ bam-analysis/
 listBams.py
 *md
 runPending*sh
+run_errors_*
+getBams_*.err
+getBams_*.log
+files_to_delete_*
