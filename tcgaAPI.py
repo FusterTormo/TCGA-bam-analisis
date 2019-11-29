@@ -13,6 +13,7 @@ def availableCancers() :
     fields = "fields=project_id"
     size = '100'
     query = "{}?{}&size={}".format(endp,fields,size)
+    # print "@@@@@@@@@@@@@@@@@@@@@@@@", query #del
     print "INFO: Get TCGA information through API"
     response = requests.get(query)
     if response.status_code == 200 :
@@ -20,13 +21,14 @@ def availableCancers() :
         for i in res['data']['hits'] :
             if i['project_id'].startswith("TCGA-") :
                 aux = i['project_id'].split("-")[1]
-                if aux not in downloaded :
-                    cancers.append(i['project_id'])
+                # if aux not in downloaded : ## HERE comment
+                cancers.append(i['project_id'])
         cancers.sort()
     else :
         print "ERROR: Error found. Description"
         print response.text
-
+    # print "*****************", cancers #del
+    # exit(1) #del
     return cancers
 
 def downloadSample(case) :
