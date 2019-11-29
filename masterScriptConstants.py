@@ -45,8 +45,15 @@ cancerPath = { "HNSC" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "ACC"  : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "THYM" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
                "PCPG" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
-               "SKCM" : "/g/strcombio/fsupek_cancer3/TCGA_bam" }
-
+               "SKCM" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+	           "TGCT" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
+               "LGG"  : "/g/strcombio/fsupek_cancer1/TCGA_bam",
+               "PRAD" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+               "ESCA" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+               "SARC" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+               "CESC" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
+               "MESO" : "/g/strcombio/fsupek_cancer1/TCGA_bam",
+               "LAML" : "/g/strcombio/fsupek_cancer3/TCGA_bam" }
 
 #"PRAD" : "/g/strcombio/fsupek_cancer3/TCGA_bam",
 
