@@ -3,7 +3,8 @@ import sqlite3
 import masterScriptConstants as mc
 
 def getCancers() :
-    notFolder = ["info", "batches"]
+    # notFolder = ["info", "batches"]
+    notFolder = ["info", "batches", "batches_BRCA_20190315", "batches_COAD_20181228", "batches_GBM_20190226", "batches_GBM_20190313", "batches_KICH_20190206", "batches_KICH_20190211", "batches_KICH_20190306", "batches_KIRC_20190227", "batches_KIRC_20190306", "batches_KIRP_20190201", "batches_KIRP_20190306", "batches_KIRP_20190409", "batches_LIHC_20190301", "batches_LUSC_20190213", "batches_PAAD_20190429", "batches_READ_20190215", "batches_READ_20190314", "batches_READ_20190411", "batches_STAD_20181220_jose", "batches_STAD_20190211", "batches_THCA_20190321", "batches_THCA_20190417", "batches_UCEC_20190510", "batches_test_GBM_20190226", "backup_dw_SKCM"]
     current = []
     cancers = []
     for i in range(1,4) :
